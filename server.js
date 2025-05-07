@@ -11,7 +11,7 @@ const app = express();
 
 // ✅ Enable CORS for development & production
 app.use(cors({
-  origin: ['http://localhost:3000', 'https://client3-ftri.onrender.com'], // update with your frontend domain
+  origin: ['http://localhost:3000'], // update with your frontend domain
   credentials: true
 }));
 
