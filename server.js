@@ -11,9 +11,13 @@ const app = express();
 
 // ✅ Enable CORS for development & production
 app.use(cors({
-  origin: ['http://localhost:3000'], // update with your frontend domain
+  origin: [
+    'http://localhost:3000',
+    'https://bakers-client.onrender.com'
+  ],
   credentials: true
 }));
+
 
 app.use(express.json());
 
