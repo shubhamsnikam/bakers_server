@@ -11,11 +11,8 @@ const app = express();
 
 // ✅ Enable CORS for development & production
 app.use(cors({
-  origin: [
-    'http://localhost:3000',
-    '*'
-  ],
-  credentials: true
+  origin: 'https://bakers-client.onrender.com', // or use '*' temporarily for testing
+  credentials: true, // if you're using cookies or authorization headers
 }));
 
 
