@@ -2,7 +2,6 @@ const express = require('express');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const cors = require('cors');
-const path = require('path');
 const connectDB = require('./config/db');
 
 dotenv.config();
@@ -16,7 +15,13 @@ app.use(cors({
   credentials: true, // if you're using cookies or authorization headers
 }));
 
+
 app.use(express.json());
+
+// ✅ Root route (to prevent 404 on base URL)
+app.get('/', (req, res) => {
+  res.send('Bakery Server is running ✅');
+});
 
 // ✅ API Routes
 app.use('/api/customers', require('./routes/customerRoutes'));
@@ -24,22 +29,6 @@ app.use('/api/products', require('./routes/productRoutes'));
 app.use('/api/sales', require('./routes/salesRoutes'));
 app.use('/api/ledger', require('./routes/ledgerRoutes'));
 app.use('/api/reports', require('./routes/reportRoutes'));
-
-// ✅ Serve React Frontend
-if (process.env.NODE_ENV === 'production') {
-  // Set static folder
-  app.use(express.static(path.join(__dirname, 'client/build')));
-
-  // All other routes should return the React app's index.html
-  app.get('*', (req, res) => {
-    res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'));
-  });
-} else {
-  // In development, you can serve the React app from the 'public' directory
-  app.get('/', (req, res) => {
-    res.send('Bakery Server is running ✅');
-  });
-}
 
 // ✅ Catch-all 404 route
 app.use((req, res) => {
