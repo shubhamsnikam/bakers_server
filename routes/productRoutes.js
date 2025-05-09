@@ -10,6 +10,10 @@ router.get('/', controller.getProducts);
 // Add a new product
 router.post('/', controller.addProduct);
 
+// Add route to get product by barcode
+router.get('/barcode/:barcode', controller.getProductByBarcode);
+
+
 // Update stock (increment or decrement)
 router.put('/:id/stock', controller.updateStock);
 
