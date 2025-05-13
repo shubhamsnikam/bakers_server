@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 
 const productSchema = new mongoose.Schema({
+<<<<<<< HEAD
   name: { 
     type: String, 
     required: true
@@ -22,6 +23,37 @@ const productSchema = new mongoose.Schema({
   manufacturingDate: { 
     type: Date
    }
+=======
+  name: {
+    type: String,
+    required: true,
+    trim: true,
+  },
+  quantity: {
+    type: Number,
+    required: true,
+    min: 0,
+  },
+  price: {
+    type: Number,
+    required: true,
+     min: 0,
+  },
+  weight: {
+    type: String,
+    default: '',
+  },
+  expiryDate: {
+    type: Date
+  },
+  manufacturingDate: {
+    type: Date
+  },
+  barcode: {
+    type: String,
+    unique: true
+  },
+>>>>>>> 32361c8 (new)
 }, { timestamps: true });
 
 // Auto-generate barcode based on _id after save

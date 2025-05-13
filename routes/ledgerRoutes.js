@@ -5,7 +5,6 @@ const Ledger = require('../models/Ledger');
 // GET all pending ledgers (total > 0)
 router.get('/', async (req, res) => {
   try {
-    // Fetch ledgers where total is greater than 0 and not marked as paid
     const ledgers = await Ledger.find({ total: { $gt: 0 }, paid: false })
       .populate('customer')
       .sort({ createdAt: -1 });
@@ -26,18 +25,13 @@ router.post('/', async (req, res) => {
   const { customer, products, total } = req.body;
 
   try {
-    // Validate required fields
     if (!customer || !products || !total) {
       return res.status(400).json({ message: 'Missing required fields: customer, products, or total' });
     }
 
-    // Create a new ledger entry
     const newLedger = new Ledger({ customer, products, total });
-
-    // Save the ledger entry
     const saved = await newLedger.save();
 
-    // Send response with the saved ledger
     res.status(201).json(saved);
   } catch (error) {
     console.error('Ledger create error:', error);
@@ -45,10 +39,9 @@ router.post('/', async (req, res) => {
   }
 });
 
-// PATCH: Mark ledger as paid
+// PATCH: Mark ledger as fully paid
 router.patch('/:id/pay', async (req, res) => {
   try {
-    // Find ledger by ID and mark it as paid, reset total to 0
     const updatedLedger = await Ledger.findByIdAndUpdate(
       req.params.id,
       { paid: true, total: 0 },
@@ -59,11 +52,53 @@ router.patch('/:id/pay', async (req, res) => {
       return res.status(404).json({ message: 'Ledger not found' });
     }
 
-    // Respond with success message and updated ledger
     res.json({ message: 'Ledger marked as paid', ledger: updatedLedger });
+
   } catch (error) {
     console.error('Ledger pay error:', error);
     res.status(500).json({ message: 'Server error updating ledger' });
+  }
+});
+
+// PATCH: Partial payment update
+router.patch('/:id/partial-pay', async (req, res) => {
+  try {
+    const ledgerId = req.params.id;
+    const { amount } = req.body;
+
+    console.log('Received amount:', amount);
+
+    if (!amount || isNaN(amount) || amount <= 0) {
+      return res.status(400).json({ success: false, message: 'Invalid amount' });
+    }
+
+    const ledger = await Ledger.findById(ledgerId);
+    if (!ledger) {
+      return res.status(404).json({ success: false, message: 'Ledger not found' });
+    }
+
+    const newTotal = ledger.total - amount;
+
+    if (newTotal < 0) {
+      return res.status(400).json({ success: false, message: 'Amount exceeds total' });
+    }
+
+    ledger.total = newTotal;
+    if (newTotal === 0) {
+      ledger.paid = true;
+    }
+
+    const updatedLedger = await ledger.save();
+
+    res.json({
+      success: true,
+      message: 'Partial payment updated',
+      ledger: updatedLedger
+    });
+
+  } catch (error) {
+    console.error('Partial payment error:', error);
+    res.status(500).json({ success: false, message: 'Server error processing partial payment' });
   }
 });
 
